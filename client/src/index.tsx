@@ -7,6 +7,15 @@ import reportWebVitals from './reportWebVitals';
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
 );
+
+// Suppress ResizeObserver loop limit exceeded error
+const resizeObserverLoopErr = 'ResizeObserver loop completed with undelivered notifications.';
+window.addEventListener('error', (e) => {
+  if (e.message.includes(resizeObserverLoopErr)) {
+    e.stopImmediatePropagation();
+  }
+});
+
 root.render(
   <React.StrictMode>
     <App />
