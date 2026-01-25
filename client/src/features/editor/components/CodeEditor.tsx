@@ -4,7 +4,12 @@ import * as Y from 'yjs';
 import { WebsocketProvider } from 'y-websocket';
 import { MonacoBinding } from 'y-monaco';
 
-export const CodeEditor: React.FC = () => {
+type Props = {
+    content?: string;
+    language?: string;
+};
+
+export const CodeEditor: React.FC<Props> = ({ content, language }) => {
     const [editor, setEditor] = useState<any>(null);
 
     useEffect(() => {
@@ -18,11 +23,22 @@ export const CodeEditor: React.FC = () => {
         // Bind YJS to Monaco Editor
         const binding = new MonacoBinding(type, editor.getModel()!, new Set([editor]), provider.awareness);
 
+        // Seed the editor with provided content (if any) once on mount
+        if (content) {
+            editor.getModel()?.setValue(content);
+        }
+
         return () => {
             provider.destroy();
             binding.destroy();
         };
     }, [editor]);
+
+    useEffect(() => {
+        if (editor && content !== undefined) {
+            editor.getModel()?.setValue(content);
+        }
+    }, [content, editor]);
 
     const handleEditorDidMount: OnMount = (editor, monaco) => {
         setEditor(editor);
@@ -33,7 +49,8 @@ export const CodeEditor: React.FC = () => {
             theme="vs-dark"
             width="100%"
             height="100%"
-            defaultLanguage="typescript"
+            language={language || "plaintext"}
+            defaultLanguage="plaintext"
             defaultValue="// Start collaborating..."
             onMount={handleEditorDidMount}
         />

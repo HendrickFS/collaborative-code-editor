@@ -1,24 +1,39 @@
-import { Tree } from 'antd';
-import { FolderOpenOutlined, FileOutlined } from '@ant-design/icons';
+import { Upload, Button } from 'antd';
+import { UploadOutlined } from '@ant-design/icons';
+import React from 'react';
+import { FileData, getFileLanguage } from '../../services/fileSystem.service';
 
-export const FileTree = () => {
+type Props = {
+    onFileLoad: (file: FileData) => void;
+};
+
+export const FileTree: React.FC<Props> = ({ onFileLoad }) => {
     return (
         <div style={{ padding: '10px' }}>
-            <Tree
-                defaultExpandAll
-                showIcon
-                treeData={[
-                    {
-                        title: 'src',
-                        key: '0-0',
-                        icon: <FolderOpenOutlined />,
-                        children: [
-                            { title: 'App.tsx', key: '0-0-1', icon: <FileOutlined /> },
-                            { title: 'index.tsx', key: '0-0-2', icon: <FileOutlined /> },
-                        ],
-                    },
-                ]}
-            />
+            <Upload
+                accept=".ts,.js,.py,.tsx,.java,.cs,.cpp,.rb,.go,.php,.txt"
+                maxCount={1}
+                style={{ width: '100%' }}
+                beforeUpload={(file) => {
+                    const reader = new FileReader();
+                    reader.onload = (event) => {
+                        const content = (event.target?.result as string) || '';
+                        const fileData: FileData = {
+                            filename: file.name,
+                            content,
+                            path: file.name,
+                            fileLanguage: getFileLanguage(file.name),
+                        };
+                        onFileLoad(fileData);
+                    };
+                    reader.readAsText(file);
+                    return false; // Prevent upload
+                }}
+            >
+                <Button icon={<UploadOutlined />} style={{ marginBottom: 16, width: '100%' }}>
+                    Load File
+                </Button>
+            </Upload>
         </div>
     );
 };
