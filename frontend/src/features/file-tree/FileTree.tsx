@@ -1,5 +1,5 @@
 import { Upload, Button } from 'antd';
-import { UploadOutlined } from '@ant-design/icons';
+import { UploadOutlined, SaveOutlined } from '@ant-design/icons';
 import React from 'react';
 import { FileData, getFileLanguage } from '../../services/fileSystem.service';
 
@@ -34,6 +34,7 @@ export const FileTree: React.FC<Props> = ({ onFileLoad }) => {
                     Load File
                 </Button>
             </Upload>
+            <Button icon={<SaveOutlined />} style={{ width: '100%', marginTop: 16 }}>Save File</Button>
         </div>
     );
 };

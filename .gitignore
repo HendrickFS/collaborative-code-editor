@@ -1,14 +1,12 @@
 # Dependencies
 node_modules/
-client/node_modules/
-server/node_modules/
 
 # Builds
 build/
 dist/
-client/build/
-client/coverage/
-server/dist/
+frontend/build/
+frontend/coverage/
+backend/dist/
 
 # Environment
 .env
