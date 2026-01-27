@@ -62,6 +62,38 @@ A collaborative code editor that enables multiple users to edit code files simul
 
 ---
 
+## How It Works
+
+### Real-time Synchronization
+
+1. **File List Sync**
+   - Uses a dedicated Yjs Map on the `'shared-file-list'` room
+   - When any user creates/uploads a file, the metadata is added to the shared map
+   - All connected clients observe changes and update their file lists automatically
+
+2. **File Content Sync**
+   - Each file operates in its own WebSocket room (keyed by *file path*)
+   - Monaco Editor bindings automatically sync content via Yjs Text CRDT
+   - Switching files disconnects from the old room and connects to the new one
+
+3. **Conflict Resolution**
+   - Yjs CRDT ensures eventual consistency without manual conflict resolution
+   - All operations are commutative and idempotent
+   - Network partitions are handled gracefully with automatic reconciliation
+  
+<img width="838" height="212" alt="image" src="https://github.com/user-attachments/assets/e8a3a50f-4342-4b29-ac6f-efef9e2137a1" />
+
+### Component Communication
+
+```
+MainLayout
+  ├─> useSharedFileList (Yjs sync)
+  ├─> FileTree (UI + file operations)
+  └─> CodeEditor (Monaco + Yjs per-file sync)
+```
+
+---
+
 ## Running the Project
 
 ### Option 1: Docker (Recommended)
@@ -130,36 +162,6 @@ Node.js and npm
    - Create or upload a file in one window
    - Watch it appear in all other windows
    - Start editing and see changes sync in real-time
-
----
-
-## How It Works
-
-### Real-time Synchronization
-
-1. **File List Sync**
-   - Uses a dedicated Yjs Map on the `'shared-file-list'` room
-   - When any user creates/uploads a file, the metadata is added to the shared map
-   - All connected clients observe changes and update their file lists automatically
-
-2. **File Content Sync**
-   - Each file operates in its own WebSocket room (keyed by *file path*)
-   - Monaco Editor bindings automatically sync content via Yjs Text CRDT
-   - Switching files disconnects from the old room and connects to the new one
-
-3. **Conflict Resolution**
-   - Yjs CRDT ensures eventual consistency without manual conflict resolution
-   - All operations are commutative and idempotent
-   - Network partitions are handled gracefully with automatic reconciliation
-
-### Component Communication
-
-```
-MainLayout
-  ├─> useSharedFileList (Yjs sync)
-  ├─> FileTree (UI + file operations)
-  └─> CodeEditor (Monaco + Yjs per-file sync)
-```
 
 ---
 
