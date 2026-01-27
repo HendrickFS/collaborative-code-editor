@@ -31,12 +31,17 @@ A collaborative code editor that enables multiple users to edit code files simul
 - **Shared File List**: All users see the same file structure; creating a file makes it visible to everyone instantly
 - **Awareness System**: Built-in user presence and cursor tracking via Yjs awareness
 
+![editor_showcase](https://github.com/user-attachments/assets/44c04033-d9cd-4075-805a-f97b409cc76a)
+
+
 ### File Management
 - **Create Files**: Generate new files with customizable names and extensions
 - **Upload Files**: Drag-and-drop or browse to upload existing code files
 - **Download/Save**: Export edited files back to your local system
 - **Multi-file Support**: Work with multiple files simultaneously
 - **Recent Files**: Local storage tracking of recently accessed files
+- 
+![filetree_showcase](https://github.com/user-attachments/assets/de79b81e-c272-4694-b478-7f39d871c95d)
 
 ---
 
