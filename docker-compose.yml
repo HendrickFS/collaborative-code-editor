@@ -1,0 +1,36 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: codeeditor-backend
+    ports:
+      - "1234:1234"
+    environment:
+      - NODE_ENV=production
+      - PORT=1234
+    restart: unless-stopped
+    networks:
+      - codeeditor-network
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: codeeditor-frontend
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - REACT_APP_API_URL=http://localhost:1234
+    depends_on:
+      - backend
+    restart: unless-stopped
+    networks:
+      - codeeditor-network
+
+networks:
+  codeeditor-network:
+    driver: bridge

@@ -1,70 +1,201 @@
-# CodeEditor
+# Collaborative Code Editor
 
-Collaborative code editor playground powered by Monaco, Yjs, and a lightweight WebSocket server. The frontend is a Create React App with Ant Design for layout; the backend is an Express + y-websocket bridge for real-time sync.
+> A real-time collaborative code editor built with **React**, **TypeScript**, **Monaco Editor**, and **Yjs**.
+
+[![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![React](https://img.shields.io/badge/React-20232A?logo=react&logoColor=61DAFB)](https://reactjs.org/)
+[![Monaco Editor](https://img.shields.io/badge/Monaco-0066B8?logo=visualstudiocode&logoColor=white)](https://microsoft.github.io/monaco-editor/)
+[![WebSocket](https://img.shields.io/badge/WebSocket-010101?logo=socketdotio&logoColor=white)](https://developer.mozilla.org/en-US/docs/Web/API/WebSocket)
+
+---
+
+## Overview
+
+A collaborative code editor that enables multiple users to edit code files simultaneously in real-time. Built as a portfolio project to showcase expertise in **real-time communication**, **state management**, **WebSocket architecture**, and **modern React patterns**.
+
+### Key Highlights
+
+- **Real-time Collaboration**: Powered by Yjs CRDT (Conflict-free Replicated Data Type) for seamless multi-user editing
+- **Multi-file Management**: Support for creating, uploading, and switching between multiple files with isolated collaboration "rooms"
+- **Production-grade Editor**: Monaco Editor with syntax highlighting for different languages
+- **Shared File System**: Synchronized file list across all connected users using distributed state management
+- **Clean Architecture**: Modular component structure with custom hooks and service layers
+
+---
 
 ## Features
-- Live collaborative editing via Yjs + y-websocket and `MonacoBinding` (room: `code-editor-room` on `ws://localhost:1234`)
-- Monaco editor with VS Code-style dark theme and language auto-detection from uploaded file extensions (ts/js/py/tsx/java/cs/cpp/rb/go/php, otherwise plaintext)
-- Upload a single local file to seed the editor (Ant Design Upload in the left sidebar); a Save button stub is present for future wiring
-- Split-pane layout using Ant Design `Layout` (dark sider + full-height editor area)
-- Minimal Express + ws bridge configured for y-websocket
 
-## Prerequisites
-- Node.js 18+ (recommended) and npm
+### Real-time Collaboration
+- **Simultaneous Editing**: Multiple users can edit the same file in real-time with automatic conflict resolution
+- **Per-file Rooms**: Each file operates in its own WebSocket room for isolated collaboration
+- **Shared File List**: All users see the same file structure; creating a file makes it visible to everyone instantly
+- **Awareness System**: Built-in user presence and cursor tracking via Yjs awareness
 
-## Quick start
-1) Install dependencies
-- Backend: `cd backend && npm install`
-- Frontend: `cd frontend && npm install`
+### File Management
+- **Create Files**: Generate new files with customizable names and extensions
+- **Upload Files**: Drag-and-drop or browse to upload existing code files
+- **Download/Save**: Export edited files back to your local system
+- **Multi-file Support**: Work with multiple files simultaneously
+- **Recent Files**: Local storage tracking of recently accessed files
 
-2) Run the collaboration server (port 1234)
-- From the `backend/` folder: `npm run dev`
+---
 
-3) Run the React app (port 3000)
-- In another terminal, from the `frontend/` folder: `npm start`
-- Open http://localhost:3000 and start typing; peers connected to the same WebSocket room will see edits in real time.
+## Technical Architecture
 
-## Configuration
-- WebSocket endpoint: the editor connects to `ws://localhost:1234` in `frontend/src/features/editor/components/CodeEditor.tsx`. Adjust host/port as needed for deployment.
-- Room name: hard-coded to `code-editor-room`; change in `CodeEditor.tsx` if you want multiple rooms.
+### Frontend Stack
+- **React** with TypeScript for type-safe component development
+- **Monaco Editor** for VS Code-level editing experience
+- **Yjs** for CRDT-based real-time synchronization
+- **Ant Design** for polished UI components
+- **Custom Hooks** for shared state management (`useSharedFileList`)
 
-## Project structure (high level)
+### Backend Stack
+- **Express.js** for lightweight HTTP server
+- **WebSocket (ws)** for real-time bidirectional communication
+- **y-websocket** for Yjs synchronization protocol
+
+### Architecture Patterns
+- **Component-driven**: Modular, reusable React components
+- **Service Layer**: Abstracted file system operations
+- **State Management**: React hooks + Yjs for distributed state
+- **Real-time Sync**: Two-tier synchronization (file list + file content)
+
+---
+
+## Running the Project
+
+### Option 1: Docker (Recommended)
+
+The easiest way to run the entire application with all dependencies pre-configured.
+
+**Prerequisites:**
+- Docker and Docker Compose installed ([Install Docker](https://www.docker.com/products/docker-desktop))
+
+**Quick Start:**
+```bash
+git clone https://github.com/HendrickFS/collaborative-code-editor
+cd codeEditor
+docker-compose up
 ```
-.
-├── backend/             # Express + y-websocket bridge (CORS enabled)
-│   ├── src/app/server.ts
-│   ├── package.json
-│   ├── tsconfig.json
-│   └── node_modules/
-├── frontend/            # Create React App frontend (Ant Design + Monaco)
-│   ├── src/layout/MainLayout.tsx       # Sider + editor layout
-│   ├── src/features/editor/components/CodeEditor.tsx
-│   ├── src/features/file-tree/FileTree.tsx   # Upload-to-editor stub
-│   ├── src/services/fileSystem.service.ts    # File metadata helpers
-│   ├── package.json
-│   ├── tsconfig.json
-│   └── node_modules/
-├── README.md
-└── .gitignore
+
+The application will be available at:
+- **Frontend**: http://localhost:3000
+- **Backend API**: http://localhost:1234
+
+### Option 2: Local Development
+
+**Prerequisites:**
+```bash
+Node.js and npm
 ```
 
-## How it works
-- Editor collaboration: [frontend/src/features/editor/components/CodeEditor.tsx](frontend/src/features/editor/components/CodeEditor.tsx) creates a Yjs doc, connects to the websocket provider, and binds to Monaco. Clean-up tears down the provider/binding on unmount.
-- File loading: [frontend/src/features/file-tree/FileTree.tsx](frontend/src/features/file-tree/FileTree.tsx) uses Ant Design Upload to read a single local file into memory, derive the language via [frontend/src/services/fileSystem.service.ts](frontend/src/services/fileSystem.service.ts), and pass it to the editor. The Save button is a placeholder.
-- Layout/theme: [frontend/src/layout/MainLayout.tsx](frontend/src/layout/MainLayout.tsx) wires the sider + content split; [frontend/src/theme/themeConfig.tsx](frontend/src/theme/themeConfig.tsx) applies Ant Design dark tokens aligned to Monaco.
-- Server: [backend/src/app/server.ts](backend/src/app/server.ts) is a small Express server that hosts a WebSocketServer and delegates collaboration to `setupWSConnection` from y-websocket.
+**Installation:**
 
-## Scripts
-- Backend: `npm run dev` – run the y-websocket server in watch mode via tsx
-- Frontend: `npm start` – start CRA dev server
-- Frontend: `npm test` – run CRA tests (watch mode)
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/HendrickFS/collaborative-code-editor
+   cd codeEditor
+   ```
 
-## Notes and limitations
-- In-memory only: documents are not persisted; restarting the server clears state.
-- File tree is static demo data; wire it to real project data as needed.
-- Security/auth is not implemented; use behind trusted networks or add auth before deployment.
+2. **Install backend dependencies**
+   ```bash
+   cd backend
+   npm install
+   ```
 
-## Deployment tips
-- Serve the backend over HTTPS/WSS when deploying behind a reverse proxy (configure `WebsocketProvider` URL accordingly).
-- Consider persistence (e.g., y-leveldb) if you need durable documents.
-- For production builds, run `cd frontend && npm run build` and host the static assets; keep the WebSocket server running alongside.
+3. **Install frontend dependencies**
+   ```bash
+   cd ../frontend
+   npm install
+   ```
+
+**Running the Application:**
+
+1. **Start the WebSocket server** (Terminal 1)
+   ```bash
+   cd backend
+   npm run dev
+   ```
+   Server will start on `http://localhost:1234`
+
+2. **Start the React app** (Terminal 2)
+   ```bash
+   cd frontend
+   npm start
+   ```
+   App will open at `http://localhost:3000`
+
+3. **Test collaboration**
+   - Open `http://localhost:3000` in multiple browser windows/tabs
+   - Create or upload a file in one window
+   - Watch it appear in all other windows
+   - Start editing and see changes sync in real-time
+
+---
+
+## How It Works
+
+### Real-time Synchronization
+
+1. **File List Sync**
+   - Uses a dedicated Yjs Map on the `'shared-file-list'` room
+   - When any user creates/uploads a file, the metadata is added to the shared map
+   - All connected clients observe changes and update their file lists automatically
+
+2. **File Content Sync**
+   - Each file operates in its own WebSocket room (keyed by *file path*)
+   - Monaco Editor bindings automatically sync content via Yjs Text CRDT
+   - Switching files disconnects from the old room and connects to the new one
+
+3. **Conflict Resolution**
+   - Yjs CRDT ensures eventual consistency without manual conflict resolution
+   - All operations are commutative and idempotent
+   - Network partitions are handled gracefully with automatic reconciliation
+
+### Component Communication
+
+```
+MainLayout
+  ├─> useSharedFileList (Yjs sync)
+  ├─> FileTree (UI + file operations)
+  └─> CodeEditor (Monaco + Yjs per-file sync)
+```
+
+---
+
+## Technologies & Libraries
+
+| Category | Technology | Purpose |
+|----------|-----------|---------|
+| **Frontend Framework** | React + TypeScript | Type-safe UI development |
+| **Code Editor** | Monaco Editor | Code editor engine |
+| **Real-time Sync** | Yjs + y-websocket + y-monaco | CRDT-based collaboration |
+| **UI Components** | Ant Design | Professional component library |
+| **Backend Server** | Express.js | Lightweight HTTP server |
+| **WebSocket** | ws + y-websocket | Real-time communication |
+| **Language** | TypeScript | Type safety across the stack |
+
+---
+
+## Learning Outcomes
+
+This project helped me to improve my skills in:
+
+- **Real-time Systems**: WebSocket communication and CRDT-based synchronization
+- **State Management**: Distributed state with Yjs, local state with React hooks
+- **TypeScript**: Strong typing across frontend and backend
+- **Component Architecture**: Modular, reusable React components
+- **Custom Hooks**: Reusable logic with `useSharedFileList`
+- **Service Layer**: Separation of concerns with file system services
+- **Monaco Integration**: Advanced editor configuration and binding
+- **WebSocket Architecture**: Room-based communication patterns
+- **User Experience**: Toast notifications, loading states, error handling
+- **Modern React**: Hooks, refs, effects, and performance optimization
+
+---
+
+## Future Enhancements
+
+- [ ] **Authentication**: User login and room access control
+- [ ] **Persistence**: Database storage for file preservation across sessions
+- [ ] **User Cursors**: Visual representation of other users' cursor positions
